@@ -3,129 +3,198 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Career Connect | 大学×企業 相互検索</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>オープンデータ就職・企業情報検索</title>
   <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      background: #0f172a;
+      background-color: #0f172a;
       color: #f8fafc;
-      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
-    .glass-card {
-      background: rgba(30, 41, 59, 0.7);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+    .container {
+      width: 100%;
+      max-width: 600px;
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    }
+    h1 {
+      font-size: 1.3rem;
+      text-align: center;
+      margin-bottom: 6px;
+      background: linear-gradient(135deg, #38bdf8, #a855f7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .subtitle {
+      text-align: center;
+      font-size: 0.8rem;
+      color: #94a3b8;
+      margin-bottom: 16px;
+    }
+    .mode-switch {
+      display: flex;
+      background: #0f172a;
+      padding: 4px;
+      border-radius: 10px;
+      margin-bottom: 16px;
+    }
+    .mode-btn {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      background: transparent;
+      color: #94a3b8;
+      font-weight: bold;
+      font-size: 0.85rem;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .mode-btn.active {
+      background: #3b82f6;
+      color: #ffffff;
+    }
+    .search-box {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    input[type="text"] {
+      flex: 1;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #475569;
+      background: #0f172a;
+      color: #ffffff;
+      font-size: 0.95rem;
+      outline: none;
+    }
+    .search-btn {
+      padding: 12px 18px;
+      background: #8b5cf6;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    .card {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: #38bdf8;
+      margin-bottom: 6px;
+    }
+    .card-snippet {
+      font-size: 0.85rem;
+      color: #cbd5e1;
+      line-height: 1.5;
+    }
+    .status-msg {
+      text-align: center;
+      color: #94a3b8;
+      padding: 20px 0;
+      font-size: 0.85rem;
     }
   </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-start p-6">
+<body>
 
-  <!-- Header -->
-  <header class="text-center my-8">
-    <h1 class="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500">
-      Career Connect
-    </h1>
-    <p class="text-slate-400 mt-2 text-sm">大学と企業をつなぐ、スマート相互検索</p>
-  </header>
+  <div class="container">
+    <h1>Open Data Search</h1>
+    <div class="subtitle">APIキー不要・オープンデータ直接検索</div>
 
-  <!-- Search App Wrapper -->
-  <main class="w-full max-w-2xl glass-card rounded-2xl p-6 shadow-2xl">
-    
-    <!-- Mode Switcher -->
-    <div class="flex bg-slate-800/80 p-1 rounded-xl mb-6">
-      <button id="btnUni" onclick="setMode('uni')" class="flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg">
-        🎓 大学名から探す
-      </button>
-      <button id="btnComp" onclick="setMode('comp')" class="flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 text-slate-400 hover:text-white">
-        🏢 企業名から探す
-      </button>
+    <!-- モード切り替え -->
+    <div class="mode-switch">
+      <button id="btnUni" class="mode-btn active" onclick="switchMode('uni')">🎓 大学から検索</button>
+      <button id="btnComp" class="mode-btn" onclick="switchMode('comp')">🏢 企業から検索</button>
     </div>
 
-    <!-- Search Bar -->
-    <div class="relative mb-6">
-      <input type="text" id="searchInput" oninput="handleSearch()" placeholder="大学名を入力 (例: 東京大学)..." 
-        class="w-full bg-slate-900/90 text-white placeholder-slate-500 text-sm rounded-xl pl-11 pr-4 py-3.5 border border-slate-700/80 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 transition-all">
-      <svg class="w-5 h-5 text-slate-500 absolute left-3.5 top-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-      </svg>
+    <!-- 検索バー -->
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="大学名を入力 (例: 東京大学)" onkeydown="if(event.key==='Enter') executeOpenDataSearch()">
+      <button class="search-btn" onclick="executeOpenDataSearch()">検索</button>
     </div>
 
-    <!-- Results Area -->
-    <div id="results" class="space-y-3"></div>
-  </main>
+    <!-- 検索結果エリア -->
+    <div id="resultsList">
+      <div class="status-msg">キーワードを入力して「検索」を押してください</div>
+    </div>
+  </div>
 
   <script>
-    const database = [
-      { uni: "東京大学", comp: "Google Japan", count: 42, ratio: "12%" },
-      { uni: "東京大学", comp: "ソニー", count: 38, ratio: "10%" },
-      { uni: "東京大学", comp: "トヨタ自動車", count: 35, ratio: "9%" },
-      { uni: "慶應義塾大学", comp: "三菱UFJ銀行", count: 85, ratio: "18%" },
-      { uni: "慶應義塾大学", comp: "リクルート", count: 62, ratio: "14%" },
-      { uni: "早稲田大学", comp: "NTTデータ", count: 78, ratio: "16%" },
-      { uni: "早稲田大学", comp: "楽天グループ", count: 54, ratio: "11%" },
-    ];
-
     let currentMode = 'uni';
 
-    function setMode(mode) {
+    function switchMode(mode) {
       currentMode = mode;
-      const btnUni = document.getElementById('btnUni');
-      const btnComp = document.getElementById('btnComp');
-      const input = document.getElementById('searchInput');
-
-      if(mode === 'uni') {
-        btnUni.className = "flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg";
-        btnComp.className = "flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 text-slate-400 hover:text-white";
-        input.placeholder = "大学名を入力 (例: 東京大学)...";
-      } else {
-        btnComp.className = "flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 bg-gradient-to-r from-purple-500 to-pink-600 text-white shadow-lg";
-        btnUni.className = "flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 text-slate-400 hover:text-white";
-        input.placeholder = "企業名を入力 (例: ソニー)...";
-      }
-      handleSearch();
+      document.getElementById('btnUni').classList.toggle('active', mode === 'uni');
+      document.getElementById('btnComp').classList.toggle('active', mode === 'comp');
+      document.getElementById('searchInput').placeholder = mode === 'uni' ? '大学名を入力 (例: 東京大学)' : '企業名を入力 (例: ソニー)';
     }
 
-    function handleSearch() {
-      const query = document.getElementById('searchInput').value.trim().toLowerCase();
-      const resultsContainer = document.getElementById('results');
-      resultsContainer.innerHTML = '';
+    async function executeOpenDataSearch() {
+      const keyword = document.getElementById('searchInput').value.trim();
+      const resultsContainer = document.getElementById('resultsList');
 
-      if(!query) {
-        resultsContainer.innerHTML = `<p class="text-center text-slate-500 text-sm py-8">キーワードを入力して検索してください</p>`;
+      if (!keyword) {
+        alert('検索キーワードを入力してください。');
         return;
       }
 
-      const filtered = database.filter(item => {
-        const target = currentMode === 'uni' ? item.uni : item.comp;
-        return target.toLowerCase().includes(query);
-      });
+      resultsContainer.innerHTML = '<div class="status-msg">🔍 公開オープンデータ（Wikipedia API）から直接取得中...</div>';
 
-      if(filtered.length === 0) {
-        resultsContainer.innerHTML = `<p class="text-center text-slate-500 text-sm py-8">該当するデータが見つかりませんでした</p>`;
-        return;
-      }
+      // 検索クエリの構築（大学名なら「就職 企業」、企業名なら「出身大学 採用」等の関連ワードを自動付与）
+      const searchQuery = currentMode === 'uni' 
+        ? `${keyword} 就職 企業` 
+        : `${keyword} 採用 大学`;
 
-      filtered.forEach(item => {
-        const title = currentMode === 'uni' ? item.comp : item.uni;
-        const sub = currentMode === 'uni' ? item.uni : item.comp;
+      // Wikipedia API (CORS対応・認証不要のオープンAPI)
+      const apiUrl = `https://ja.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(searchQuery)}&format=json&origin=*`;
+
+      try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) throw new Error('通信エラーが発生しました');
+
+        const data = await response.json();
+        const searchResults = data.query.search;
+
+        if (!searchResults || searchResults.length === 0) {
+          resultsContainer.innerHTML = '<div class="status-msg">該当する公開データが見つかりませんでした。</div>';
+          return;
+        }
+
+        resultsContainer.innerHTML = '';
         
-        const card = document.createElement('div');
-        card.className = "p-4 rounded-xl bg-slate-800/50 border border-slate-700/50 hover:border-slate-600 transition-all flex items-center justify-between";
-        card.innerHTML = `
-          <div>
-            <div class="text-xs text-purple-400 font-medium">${sub}</div>
-            <div class="text-base font-bold text-white mt-0.5">${title}</div>
-          </div>
-          <div class="text-right">
-            <span class="text-sm font-bold text-blue-400">${item.count}名</span>
-            <span class="text-xs text-slate-500 block">実績比率 ${item.ratio}</span>
-          </div>
-        `;
-        resultsContainer.appendChild(card);
-      });
-    }
+        searchResults.slice(0, 5).forEach(item => {
+          // 不要なHTMLタグの除去
+          const cleanSnippet = item.snippet.replace(/<span class="searchmatch">/g, '').replace(/<\/span>/g, '');
+          
+          const card = document.createElement('div');
+          card.className = 'card';
+          card.innerHTML = `
+            <div class="card-title">${item.title}</div>
+            <div class="card-snippet">${cleanSnippet}...</div>
+          `;
+          resultsContainer.appendChild(card);
+        });
 
-    handleSearch();
+      } catch (err) {
+        resultsContainer.innerHTML = `<div class="status-msg" style="color:#ef4444;">データの取得に失敗しました。<br>(${err.message})</div>`;
+      }
+    }
   </script>
 </body>
 </html>
