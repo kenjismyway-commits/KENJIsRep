@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>リアルタイムWeb就職検索 (Top 20)</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: #0f172a;
+      color: #f8fafc;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .container {
+      width: 100%;
+      max-width: 650px;
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    }
+    h1 {
+      font-size: 1.3rem;
+      text-align: center;
+      margin-bottom: 6px;
+      background: linear-gradient(135deg, #38bdf8, #a855f7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .subtitle {
+      text-align: center;
+      font-size: 0.8rem;
+      color: #94a3b8;
+      margin-bottom: 16px;
+    }
+    .mode-switch {
+      display: flex;
+      background: #0f172a;
+      padding: 4px;
+      border-radius: 10px;
+      margin-bottom: 16px;
+    }
+    .mode-btn {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      background: transparent;
+      color: #94a3b8;
+      font-weight: bold;
+      font-size: 0.85rem;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .mode-btn.active {
+      background: #3b82f6;
+      color: #ffffff;
+    }
+    .search-box {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    input[type="text"] {
+      flex: 1;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #475569;
+      background: #0f172a;
+      color: #ffffff;
+      font-size: 0.95rem;
+      outline: none;
+    }
+    .search-btn {
+      padding: 12px 18px;
+      background: #8b5cf6;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    .results-count {
+      font-size: 0.8rem;
+      color: #38bdf8;
+      margin-bottom: 12px;
+      font-weight: bold;
+    }
+    .card {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 12px;
+      position: relative;
+    }
+    .card-num {
+      display: inline-block;
+      background: #334155;
+      color: #a855f7;
+      font-size: 0.75rem;
+      font-weight: bold;
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-bottom: 6px;
+    }
+    .card-title {
+      font-size: 0.95rem;
+      font-weight: bold;
+      color: #38bdf8;
+      margin-bottom: 6px;
+      line-height: 1.4;
+    }
+    .card-snippet {
+      font-size: 0.82rem;
+      color: #cbd5e1;
+      line-height: 1.5;
+    }
+    .status-msg {
+      text-align: center;
+      color: #94a3b8;
+      padding: 20px 0;
+      font-size: 0.85rem;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Live Web Search</h1>
+    <div class="subtitle">APIキー不要・上位20件リアルタイム取得</div>
+
+    <!-- モード切り替え -->
+    <div class="mode-switch">
+      <button id="btnUni" class="mode-btn active" onclick="switchMode('uni')">🎓 大学から検索</button>
+      <button id="btnComp" class="mode-btn" onclick="switchMode('comp')">🏢 企業から検索</button>
+    </div>
+
+    <!-- 検索バー -->
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="大学名を入力 (例: 法政大学)" onkeydown="if(event.key==='Enter') executeLiveSearch()">
+      <button class="search-btn" onclick="executeLiveSearch()">Web検索</button>
+    </div>
+
+    <!-- 件数表示 ＆ 検索結果エリア -->
+    <div id="countDisplay"></div>
+    <div id="resultsList">
+      <div class="status-msg">大学名または企業名を入力して「Web検索」を押してください</div>
+    </div>
+  </div>
+
+  <script>
+    let currentMode = 'uni';
+
+    function switchMode(mode) {
+      currentMode = mode;
+      document.getElementById('btnUni').classList.toggle('active', mode === 'uni');
+      document.getElementById('btnComp').classList.toggle('active', mode === 'comp');
+      document.getElementById('searchInput').placeholder = mode === 'uni' ? '大学名を入力 (例: 法政大学)' : '企業名を入力 (例: トヨタ自動車)';
+    }
+
+    async function executeLiveSearch() {
+      const keyword = document.getElementById('searchInput').value.trim();
+      const resultsContainer = document.getElementById('resultsList');
+      const countDisplay = document.getElementById('countDisplay');
+
+      if (!keyword) {
+        alert('キーワードを入力してください');
+        return;
+      }
+
+      countDisplay.innerHTML = '';
+      resultsContainer.innerHTML = '<div class="status-msg">🌐 Web上の最新データを取得・解析中...<br>(数秒かかります)</div>';
+
+      const queryText = currentMode === 'uni'
+        ? `${keyword} 主要就職先 人数 就職実績`
+        : `${keyword} 採用大学 出身大学 就職人数`;
+
+      const ddgUrl = `https://html.duckduckgo.com/html/?q=${encodeURIComponent(queryText)}`;
+      const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(ddgUrl)}`;
+
+      try {
+        const response = await fetch(proxyUrl);
+        if (!response.ok) throw new Error('通信エラー');
+
+        const data = await response.json();
+        
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(data.contents, 'text/html');
+        const searchResults = doc.querySelectorAll('.result');
+
+        if (!searchResults || searchResults.length === 0) {
+          resultsContainer.innerHTML = '<div class="status-msg">Web上で該当する情報が見つかりませんでした</div>';
+          return;
+        }
+
+        resultsContainer.innerHTML = '';
+        let validCount = 0;
+
+        searchResults.forEach(result => {
+          // 上位20件に達したら打ち切り
+          if (validCount >= 20) return;
+
+          const titleEl = result.querySelector('.result__title');
+          const snippetEl = result.querySelector('.result__snippet');
+
+          if (titleEl && snippetEl) {
+            validCount++;
+            const title = titleEl.textContent.trim();
+            const snippet = snippetEl.textContent.trim();
+
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `
+              <div class="card-num">#${validCount}</div>
+              <div class="card-title">${title}</div>
+              <div class="card-snippet">${snippet}</div>
+            `;
+            resultsContainer.appendChild(card);
+          }
+        });
+
+        countDisplay.innerHTML = `<div class="results-count">🔍 上位 ${validCount} 件の検索結果を表示中</div>`;
+
+      } catch (err) {
+        resultsContainer.innerHTML = `<div class="status-msg" style="color:#ef4444;">検索に失敗しました。<br>ネットワーク環境を確認して再試行してください。</div>`;
+      }
+    }
+  </script>
+</body>
+</html>
