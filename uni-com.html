@@ -156,45 +156,4 @@
 
       resultsContainer.innerHTML = '<div class="status-msg">🔍 公開オープンデータ（Wikipedia API）から直接取得中...</div>';
 
-      // 検索クエリの構築（大学名なら「就職 企業」、企業名なら「出身大学 採用」等の関連ワードを自動付与）
-      const searchQuery = currentMode === 'uni' 
-        ? `${keyword} 就職 企業` 
-        : `${keyword} 採用 大学`;
-
-      // Wikipedia API (CORS対応・認証不要のオープンAPI)
-      const apiUrl = `https://ja.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(searchQuery)}&format=json&origin=*`;
-
-      try {
-        const response = await fetch(apiUrl);
-        if (!response.ok) throw new Error('通信エラーが発生しました');
-
-        const data = await response.json();
-        const searchResults = data.query.search;
-
-        if (!searchResults || searchResults.length === 0) {
-          resultsContainer.innerHTML = '<div class="status-msg">該当する公開データが見つかりませんでした。</div>';
-          return;
-        }
-
-        resultsContainer.innerHTML = '';
-        
-        searchResults.slice(0, 5).forEach(item => {
-          // 不要なHTMLタグの除去
-          const cleanSnippet = item.snippet.replace(/<span class="searchmatch">/g, '').replace(/<\/span>/g, '');
-          
-          const card = document.createElement('div');
-          card.className = 'card';
-          card.innerHTML = `
-            <div class="card-title">${item.title}</div>
-            <div class="card-snippet">${cleanSnippet}...</div>
-          `;
-          resultsContainer.appendChild(card);
-        });
-
-      } catch (err) {
-        resultsContainer.innerHTML = `<div class="status-msg" style="color:#ef4444;">データの取得に失敗しました。<br>(${err.message})</div>`;
-      }
-    }
-  </script>
-</body>
-</html>
+      // 検索クエリの構築（大学名なら「就職 企業」、企業名なら「出身大学 採用」等の関連
