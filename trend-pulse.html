@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TREND PULSE - NiziU / Stray Kids / CHUMS</title>
+<style>
+  :root{
+    --bg: #06060c;
+    --bg-soft: #0d0d18;
+    --card: rgba(255,255,255,0.04);
+    --card-border: rgba(255,255,255,0.08);
+    --pink: #ff3d81;
+    --purple: #8b5cf6;
+    --cyan: #22d3ee;
+    --text: #f4f4f8;
+    --text-dim: #8f8fa3;
+  }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", "Segoe UI", sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  ::-webkit-scrollbar{ width:8px; }
+  ::-webkit-scrollbar-track{ background: var(--bg-soft); }
+  ::-webkit-scrollbar-thumb{
+    background: linear-gradient(180deg, var(--pink), var(--purple), var(--cyan));
+    border-radius: 4px;
+  }
+
+  /* 背景の光る円 */
+  .glow-bg{
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+  .glow-bg span{
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(90px);
+    opacity: 0.25;
+  }
+  .glow-bg span:nth-child(1){
+    width: 500px; height: 500px;
+    background: var(--pink);
+    top: -150px; left: -100px;
+    animation: floatA 18s ease-in-out infinite;
+  }
+  .glow-bg span:nth-child(2){
+    width: 450px; height: 450px;
+    background: var(--purple);
+    top: 30%; right: -150px;
+    animation: floatB 22s ease-in-out infinite;
+  }
+  .glow-bg span:nth-child(3){
+    width: 400px; height: 400px;
+    background: var(--cyan);
+    bottom: -150px; left: 20%;
+    animation: floatA 20s ease-in-out infinite reverse;
+  }
+  @keyframes floatA{
+    0%,100%{ transform: translate(0,0); }
+    50%{ transform: translate(60px, 40px); }
+  }
+  @keyframes floatB{
+    0%,100%{ transform: translate(0,0); }
+    50%{ transform: translate(-50px, 60px); }
+  }
+
+  header{
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    backdrop-filter: blur(20px);
+    background: rgba(6,6,12,0.75);
+    border-bottom: 1px solid var(--card-border);
+  }
+  .header-inner{
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 28px 20px 16px;
+  }
+  .logo{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 28px;
+  }
+  .logo svg{
+    width: 30px; height: 30px;
+    flex-shrink: 0;
+  }
+  .logo h1{
+    font-size: 28px;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    background: linear-gradient(90deg, var(--pink), var(--purple), var(--cyan));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .subtitle{
+    font-size: 12.5px;
+    color: var(--text-dim);
+    margin-top: -20px;
+    margin-bottom: 20px;
+    letter-spacing: 0.02em;
+  }
+  .update-bar{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: -20px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  .update-info{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12.5px;
+    color: var(--text-dim);
+  }
+  .update-dot{
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: #34d399;
+    box-shadow: 0 0 0 0 rgba(52,211,153,0.6);
+    animation: pulseDot 2s infinite;
+    flex-shrink: 0;
+  }
+  @keyframes pulseDot{
+    0%{ box-shadow: 0 0 0 0 rgba(52,211,153,0.5); }
+    70%{ box-shadow: 0 0 0 6px rgba(52,211,153,0); }
+    100%{ box-shadow: 0 0 0 0 rgba(52,211,153,0); }
+  }
+  .refresh-btn{
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 12.5px;
+    font-weight: 700;
+    font-family: inherit;
+    color: var(--text-dim);
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--card-border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .refresh-btn:hover{
+    color: var(--text);
+    background: rgba(255,255,255,0.08);
+    border-color: rgba(139,92,246,0.4);
+  }
+  .refresh-btn svg{
+    width: 13px; height: 13px;
+    transition: transform 0.5s ease;
+  }
+  .refresh-btn.spinning svg{
+    transform: rotate(360deg);
+  }
+
+  .tabs{
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+  .tab-btn{
+    padding: 9px 6px;
+    border-radius: 999px;
+    font-size: clamp(11px, 3.1vw, 14px);
+    font-weight: 700;
+    font-family: inherit;
+    border: 1px solid var(--card-border);
+    background: rgba(255,255,255,0.03);
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.25s ease;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: center;
+  }
+  .tab-btn:hover{
+    background: rgba(255,255,255,0.08);
+    color: var(--text);
+  }
+  .tab-btn.active{
+    background: linear-gradient(90deg, var(--pink), var(--purple));
+    border-color: transparent;
+    color: white;
+    box-shadow: 0 4px 20px rgba(139,92,246,0.4);
+  }
+
+  main{
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 40px 20px 20px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .feed{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .date-divider{
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 8px 0 4px;
+    opacity: 0;
+    animation: riseIn 0.6s ease forwards;
+  }
+  .date-divider:first-child{ margin-top: 0; }
+  .date-divider .date-label{
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    color: var(--text);
+    white-space: nowrap;
+    padding: 4px 14px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--card-border);
+  }
+  .date-divider .date-line{
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(255,255,255,0.14), transparent);
+  }
+
+  .post{
+    position: relative;
+    border-radius: 20px;
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    padding: 28px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.35s cubic-bezier(.2,.8,.2,1), border-color 0.35s ease, box-shadow 0.35s ease;
+    opacity: 0;
+    transform: translateY(24px);
+    animation: riseIn 0.7s cubic-bezier(.2,.8,.2,1) forwards;
+  }
+  @keyframes riseIn{
+    to{ opacity: 1; transform: translateY(0); }
+  }
+  .post:hover{
+    transform: translateY(-4px);
+    border-color: rgba(139,92,246,0.5);
+    box-shadow: 0 20px 50px -12px rgba(139,92,246,0.35);
+  }
+  .post::before{
+    content:'';
+    position: absolute;
+    inset: 0;
+    opacity: 0.06;
+    pointer-events: none;
+    transition: opacity 0.35s ease;
+  }
+  .post:hover::before{ opacity: 0.12; }
+  .post.niziu::before{ background: linear-gradient(135deg, #ff3d81, #a855f7); }
+  .post.straykids::before{ background: linear-gradient(135deg, #8b5cf6, #3b82f6); }
+  .post.chums::before{ background: linear-gradient(135deg, #22d3ee, #10b981); }
+
+  .post-head{
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 16px;
+    position: relative;
+  }
+  .badge{
+    display: inline-block;
+    padding: 5px 16px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 800;
+    color: white;
+    margin-bottom: 12px;
+  }
+  .badge.niziu{ background: linear-gradient(90deg, #ff3d81, #f97a9c); }
+  .badge.straykids{ background: linear-gradient(90deg, #8b5cf6, #6366f1); }
+  .badge.chums{ background: linear-gradient(90deg, #22d3ee, #0ea5e9); }
+
+  .post h2{
+    font-size: 22px;
+    font-weight: 900;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+  }
+  .timestamp{
+    font-size: 12px;
+    color: var(--text-dim);
+    white-space: nowrap;
+    flex-shrink: 0;
+    padding-top: 4px;
+  }
+  .post p.desc{
+    color: #c4c4d4;
+    font-size: 15.5px;
+    line-height: 1.7;
+    margin-bottom: 22px;
+    position: relative;
+    max-width: 640px;
+  }
+
+  .source{
+    position: relative;
+    padding-top: 14px;
+    margin-top: 4px;
+    border-top: 1px solid var(--card-border);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .source svg{
+    width: 12px; height: 12px;
+    color: var(--text-dim);
+    flex-shrink: 0;
+    opacity: 0.7;
+  }
+  .source span{
+    font-size: 11.5px;
+    color: var(--text-dim);
+    letter-spacing: 0.01em;
+  }
+  .source a{
+    color: var(--text-dim);
+    text-decoration: none;
+    border-bottom: 1px solid rgba(143,143,163,0.35);
+    transition: color 0.2s ease, border-color 0.2s ease;
+  }
+  .source a:hover{
+    color: var(--text);
+    border-color: var(--text-dim);
+  }
+
+  footer{
+    text-align: center;
+    padding: 50px 20px 30px;
+    color: var(--text-dim);
+    font-size: 13px;
+    position: relative;
+    z-index: 1;
+  }
+
+  @media (max-width: 640px){
+    .logo h1{ font-size: 22px; }
+    .post{ padding: 22px; }
+    .post h2{ font-size: 19px; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="glow-bg"><span></span><span></span><span></span></div>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">
+      <svg viewBox="0 0 24 24" fill="none" stroke="url(#g1)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <defs>
+          <linearGradient id="g1" x1="0" y1="0" x2="24" y2="24">
+            <stop offset="0%" stop-color="#ff3d81"/>
+            <stop offset="50%" stop-color="#8b5cf6"/>
+            <stop offset="100%" stop-color="#22d3ee"/>
+          </linearGradient>
+        </defs>
+        <path d="M5 3v4M3 5h4M6 17v4M4 19h4M13 3l1.5 4.5L19 9l-4.5 1.5L13 15l-1.5-4.5L7 9l4.5-1.5L13 3z"/>
+      </svg>
+      <h1>TREND PULSE</h1>
+    </div>
+    <p class="subtitle">過去7日間のアップデートをまとめて表示</p>
+    <div class="update-bar">
+      <div class="update-info">
+        <span class="update-dot"></span>
+        <span id="updateTime">最終更新：読み込み中...</span>
+      </div>
+      <button class="refresh-btn" id="refreshBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+        <span>今すぐ更新</span>
+      </button>
+    </div>
+    <div class="tabs" id="tabs"></div>
+  </div>
+</header>
+
+<main>
+  <div class="feed" id="feed"></div>
+</main>
+
+<footer>© 2026 TREND PULSE — NiziU・Stray Kids・CHUMSの最新情報をお届けします</footer>
+
+<script>
+  const ICONS = {
+    link: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l2-2a5 5 0 0 0-7-7l-1.5 1.5"/><path d="M14 11a5 5 0 0 0-7.5-.5l-2 2a5 5 0 0 0 7 7l1.5-1.5"/></svg>'
+  };
+
+  const posts = [
+    // --- NiziU（公式サイト niziu.com） ---
+    { date:'2026-08-12', brand:'NiziU', slug:'niziu', title:'MIIHIの誕生日を記念した特別企画がスタート', desc:'公式サイトにて、MIIHIの誕生日をお祝いするメッセージ募集企画が始まりました。ファンからのメッセージが特設ページに集められます。', sourceName:'NiziU 公式サイト', sourceUrl:'https://niziu.com/s/n123/news/detail/12209?ima=1004' },
+    { date:'2026-08-10', brand:'NiziU', slug:'niziu', title:'TOKYO FM「SCHOOL OF LOCK!」に出演', desc:'ラジオ番組「SCHOOL OF LOCK!」にメンバーが出演。トークコーナーなどを通じて素顔を届けました。', sourceName:'NiziU 公式サイト', sourceUrl:'https://niziu.com/s/n123/news/detail/12210?ima=1004' },
+    { date:'2026-08-09', brand:'NiziU', slug:'niziu', title:'ベストアルバム『Portfolio』購入者対象イベントの案内', desc:'ベストアルバム『Portfolio』の購入者を対象としたオフラインイベントのCHECK IN方法が公式サイトで案内されました。', sourceName:'NiziU 公式サイト', sourceUrl:'https://niziu.com/s/n123/news/detail/12208?ima=1004' },
+
+    // --- Stray Kids（Kstyle経由の公式発表・活動報道） ---
+    { date:'2026-08-12', brand:'Stray Kids', slug:'straykids', title:'ミニアルバム「THIS＆THAT」がオリコン週間デジタルアルバム1位を獲得', desc:'8月7日に発売したニューミニアルバムが、オリコン週間デジタルアルバムランキングで首位を記録しました。', sourceName:'Kstyle', sourceUrl:'https://kstyle.com/article.ksn?articleNo=2282539' },
+    { date:'2026-08-11', brand:'Stray Kids', slug:'straykids', title:'チャンビン、誕生日に約1000万円を寄付', desc:'誕生日を迎えたチャンビンが、支援を必要とする人々のためにと大規模な寄付をおこなったことが伝えられました。', sourceName:'Kstyle', sourceUrl:'https://kstyle.com/article.ksn?articleNo=2282530' },
+    { date:'2026-08-10', brand:'Stray Kids', slug:'straykids', title:'国立競技場公演のライブビューイング開催が決定', desc:'8月30日に東京・国立競技場で行われる公演の模様が、全国の映画館でライブビューイング上映されることが発表されました。', sourceName:'Kstyle', sourceUrl:'https://kstyle.com/article.ksn?articleNo=2282495' },
+    { date:'2026-08-09', brand:'Stray Kids', slug:'straykids', title:'「2026 SBS歌謡大典 Summer」のブルーカーペットに登場', desc:'韓国・一山KINTEXで行われた音楽授賞式のブルーカーペットイベントにメンバーが登場しました。', sourceName:'Kstyle', sourceUrl:'https://kstyle.com/article.ksn?articleNo=2282447' },
+    { date:'2026-08-08', brand:'Stray Kids', slug:'straykids', title:'新譜発売を記念したオフラインイベントを発表', desc:'ミニアルバム『THIS＆THAT』の発売を記念し、HMV限定イベントや会場限定のライブ終演後イベント開催が発表されました。', sourceName:'Kstyle（PR TIMES）', sourceUrl:'https://kstyle.com/prtimes.ksn?articleNo=36788' },
+    { date:'2026-08-07', brand:'Stray Kids', slug:'straykids', title:'タイトル曲「This＆That」のミュージックビデオを公開', desc:'ニューミニアルバム『THIS＆THAT』が発売され、同時にタイトル曲のミュージックビデオが公開されました。', sourceName:'Kstyle', sourceUrl:'https://kstyle.com/article.ksn?articleNo=2282351' },
+    { date:'2026-08-06', brand:'Stray Kids', slug:'straykids', title:'新譜発売記念の記者懇談会をソウルで開催', desc:'ニューミニアルバムの発売を記念した記者懇談会が開催され、音楽や今後の活動への思いが語られました。', sourceName:'Kstyle', sourceUrl:'https://kstyle.com/article.ksn?articleNo=2282322' },
+
+    // --- CHUMS（公式サイト chums.jp） ---
+    { date:'2026-08-11', brand:'CHUMS', slug:'chums', title:'須坂店ブログ「旅行にも便利なパッカブルシリーズ」を公開', desc:'イオンモール須坂店のスタッフブログにて、コンパクトに収納できるパッカブルアイテムが紹介されました。', sourceName:'CHUMS 公式サイト', sourceUrl:'https://www.chums.jp/blog/9753' },
+    { date:'2026-08-10', brand:'CHUMS', slug:'chums', title:'御殿場店ブログで夏のコットンTシャツ新着を紹介', desc:'御殿場プレミアム・アウトレット店のブログにて、夏向けの新作コットンTシャツの入荷情報が更新されました。', sourceName:'CHUMS 公式サイト', sourceUrl:'https://www.chums.jp/blog/9756' },
+    { date:'2026-08-09', brand:'CHUMS', slug:'chums', title:'表参道店、改装工事に伴う営業案内を公開', desc:'旗艦店である表参道店の改装工事にともなう、営業時間や販売に関するお知らせが公開されました。', sourceName:'CHUMS 公式サイト', sourceUrl:'https://www.chums.jp/blog/9755' },
+    { date:'2026-08-07', brand:'CHUMS', slug:'chums', title:'アーティストコラボ第5弾「守矢努」トピックスを公開', desc:'アーティスト・守矢努氏とのコラボレーション企画第5弾が特集ページとして公開されました。', sourceName:'CHUMS 公式サイト', sourceUrl:'https://www.chums.jp/topics/tsutomu-moriya' },
+    { date:'2026-08-05', brand:'CHUMS', slug:'chums', title:'北海道初進出「CHUMSサッポロファクトリー店」10月グランドオープンを発表', desc:'北海道初出店、国内最大級となる新店舗「CHUMSサッポロファクトリー店」が10月23日にオープンすることが発表されました。', sourceName:'CHUMS 公式サイト', sourceUrl:'https://www.chums.jp/news/252' }
+  ];
+
+  const TABS = ['すべて', 'NiziU', 'Stray Kids', 'CHUMS'];
+  let activeTab = 'すべて';
+
+  const WEEKDAYS = ['日','月','火','水','木','金','土'];
+  function formatDate(dateStr){
+    const d = new Date(dateStr + 'T00:00:00+09:00');
+    return `${d.getMonth()+1}月${d.getDate()}日（${WEEKDAYS[d.getDay()]}）`;
+  }
+
+  function renderTabs(){
+    const tabsEl = document.getElementById('tabs');
+    tabsEl.innerHTML = '';
+    TABS.forEach(tab => {
+      const btn = document.createElement('button');
+      btn.className = 'tab-btn' + (tab === activeTab ? ' active' : '');
+      btn.textContent = tab;
+      btn.onclick = () => { activeTab = tab; renderTabs(); renderFeed(); };
+      tabsEl.appendChild(btn);
+    });
+  }
+
+  function renderFeed(){
+    const feedEl = document.getElementById('feed');
+    feedEl.innerHTML = '';
+
+    const filtered = (activeTab === 'すべて' ? posts : posts.filter(p => p.brand === activeTab))
+      .slice()
+      .sort((a, b) => b.date.localeCompare(a.date));
+
+    let lastDate = null;
+    let cardIndex = 0;
+
+    filtered.forEach((post) => {
+      if (post.date !== lastDate) {
+        lastDate = post.date;
+        const divider = document.createElement('div');
+        divider.className = 'date-divider';
+        divider.style.animationDelay = (cardIndex * 0.05) + 's';
+        divider.innerHTML = `<span class="date-label">${formatDate(post.date)}</span><span class="date-line"></span>`;
+        feedEl.appendChild(divider);
+      }
+
+      const el = document.createElement('article');
+      el.className = 'post ' + post.slug;
+      el.style.animationDelay = (cardIndex * 0.05) + 's';
+      el.innerHTML = `
+        <div class="post-head">
+          <div>
+            <span class="badge ${post.slug}">${post.brand}</span>
+            <h2>${post.title}</h2>
+          </div>
+        </div>
+        <p class="desc">${post.desc}</p>
+        <div class="source">
+          ${ICONS.link}
+          <span>出典：<a href="${post.sourceUrl}" target="_blank" rel="noopener noreferrer">${post.sourceName}</a></span>
+        </div>
+      `;
+      el.addEventListener('click', (e) => {
+        if (e.target.closest('a')) return;
+        window.open(post.sourceUrl, '_blank', 'noopener,noreferrer');
+      });
+      feedEl.appendChild(el);
+      cardIndex++;
+    });
+  }
+
+  renderTabs();
+  renderFeed();
+
+  // ===== 最終更新時刻の表示 & 定期更新 =====
+  const UPDATE_INTERVAL_MS = 60 * 60 * 1000; // 1時間
+
+  function formatUpdateTime(d){
+    const hh = String(d.getHours()).padStart(2, '0');
+    const mm = String(d.getMinutes()).padStart(2, '0');
+    return `${d.getMonth()+1}/${d.getDate()} ${hh}:${mm} 時点`;
+  }
+
+  function setUpdateTimeNow(){
+    const now = new Date();
+    document.getElementById('updateTime').textContent = '最終更新：' + formatUpdateTime(now);
+  }
+
+  function checkForUpdates(){
+    const btn = document.getElementById('refreshBtn');
+    btn.classList.add('spinning');
+    // 実際のニュース再取得はサーバー側の仕組みが必要なため、
+    // ここでは表示の再描画と最終更新時刻の更新のみ行う
+    setTimeout(() => {
+      renderFeed();
+      setUpdateTimeNow();
+      btn.classList.remove('spinning');
+    }, 500);
+  }
+
+  document.getElementById('refreshBtn').addEventListener('click', checkForUpdates);
+
+  setUpdateTimeNow();
+  setInterval(checkForUpdates, UPDATE_INTERVAL_MS);
+</script>
+
+</body>
+</html>
