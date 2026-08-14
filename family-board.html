@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Family Board</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #000;
+            color: #fff;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* ログイン画面 */
+        .login-screen {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .login-box {
+            background-color: #1a1a1a;
+            border: 1px solid rgba(217, 119, 6, 0.3);
+            border-radius: 16px;
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .login-box h1 {
+            font-size: 32px;
+            color: #d97706;
+            margin-bottom: 30px;
+        }
+
+        .login-box input {
+            width: 100%;
+            padding: 12px 16px;
+            background-color: #2a2a2a;
+            border: 1px solid rgba(217, 119, 6, 0.3);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 16px;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+
+        .login-box input:focus {
+            outline: none;
+            border-color: #d97706;
+            box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.2);
+        }
+
+        .login-box input::placeholder {
+            color: #666;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #d97706;
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .login-btn:hover {
+            background-color: #b45309;
+        }
+
+        /* メイン画面 */
+        .main-screen {
+            display: none;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-top: 20px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            color: #d97706;
+        }
+
+        .logout-btn {
+            background: none;
+            border: none;
+            color: #d97706;
+            cursor: pointer;
+            font-size: 24px;
+            transition: color 0.3s;
+        }
+
+        .logout-btn:hover {
+            color: #f59e0b;
+        }
+
+        .post-form {
+            background-color: #1a1a1a;
+            border: 1px solid rgba(217, 119, 6, 0.3);
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #ccc;
+            margin-bottom: 12px;
+        }
+
+        .member-buttons {
+            display: flex;
+            gap: 16px;
+        }
+
+        .member-btn {
+            flex: 1;
+            padding: 8px;
+            background-color: #2a2a2a;
+            border: 1px solid rgba(217, 119, 6, 0.3);
+            color: #fff;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .member-btn.active {
+            background-color: #d97706;
+            color: #000;
+            border-color: #d97706;
+        }
+
+        .member-btn:hover {
+            border-color: #d97706;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 12px;
+            background-color: #2a2a2a;
+            border: 1px solid rgba(217, 119, 6, 0.3);
+            border-radius: 6px;
+            color: #fff;
+            font-size: 14px;
+            resize: none;
+            height: 100px;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #d97706;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #d97706;
+            color: #000;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 16px;
+            transition: all 0.3s;
+        }
+
+        .submit-btn:hover {
+            background-color: #b45309;
+        }
+
+        .posts-list {
+            space-y: 16px;
+        }
+
+        .post {
+            background-color: #1a1a1a;
+            border: 1px solid rgba(217, 119, 6, 0.3);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 16px;
+            transition: all 0.3s;
+        }
+
+        .post:hover {
+            border-color: rgba(217, 119, 6, 0.6);
+        }
+
+        .post-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .post-author {
+            color: #d97706;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .post-time {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .post-content {
+            color: #ccc;
+            line-height: 1.6;
+            word-break: break-word;
+            white-space: pre-wrap;
+            margin-bottom: 12px;
+        }
+
+        .delete-btn {
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            font-size: 18px;
+            transition: color 0.3s;
+        }
+
+        .delete-btn:hover {
+            color: #d97706;
+        }
+
+        .confirm-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .confirm-btn, .cancel-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .confirm-btn {
+            background-color: #d97706;
+            color: #000;
+        }
+
+        .confirm-btn:hover {
+            background-color: #b45309;
+        }
+
+        .cancel-btn {
+            background-color: #3a3a3a;
+            color: #fff;
+        }
+
+        .cancel-btn:hover {
+            background-color: #4a4a4a;
+        }
+
+        .empty-message {
+            text-align: center;
+            color: #666;
+            padding: 40px 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- ログイン画面 -->
+    <div id="loginScreen" class="login-screen">
+        <div class="login-box">
+            <h1>Family Board</h1>
+            <input 
+                type="password" 
+                id="passwordInput" 
+                placeholder="パスワードを入力"
+                onkeypress="if(event.key==='Enter') handleLogin()"
+            >
+            <button class="login-btn" onclick="handleLogin()">入る</button>
+        </div>
+    </div>
+
+    <!-- メイン画面 -->
+    <div id="mainScreen" class="main-screen">
+        <div class="container">
+            <!-- ヘッダー -->
+            <div class="header">
+                <h1>Family Board</h1>
+                <button class="logout-btn" onclick="handleLogout()" title="ログアウト">⊗</button>
+            </div>
+
+            <!-- 投稿フォーム -->
+            <div class="post-form">
+                <div class="form-group">
+                    <label>記入者のイニシャル。</label>
+                    <div class="member-buttons">
+                        <button class="member-btn" data-member="K" onclick="selectMember('K')">K</button>
+                        <button class="member-btn" data-member="Y" onclick="selectMember('Y')">Y</button>
+                        <button class="member-btn" data-member="M" onclick="selectMember('M')">M</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>メッセージ</label>
+                    <textarea id="postContent" placeholder=""></textarea>
+                </div>
+
+                <button class="submit-btn" onclick="submitPost()">投稿する</button>
+            </div>
+
+            <!-- 投稿一覧 -->
+            <div class="posts-list" id="postsList"></div>
+        </div>
+    </div>
+
+    <script>
+        const HASHED_PASSWORD = 'edee29f882543b956620b26d0ee0e7e950399b1c4222f5de05e06425b4c995e9';
+        let selectedMember = '';
+        let posts = [];
+
+        // ページロード時の初期化
+        function init() {
+            loadPosts();
+            renderPosts();
+        }
+
+        // SHA256ハッシュ関数
+        async function hashPassword(password) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(password);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            return hashHex;
+        }
+
+        // ログイン処理
+        async function handleLogin() {
+            const password = document.getElementById('passwordInput').value;
+            const hashed = await hashPassword(password);
+            
+            if (hashed === HASHED_PASSWORD) {
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('mainScreen').style.display = 'block';
+                document.getElementById('passwordInput').value = '';
+            } else {
+                alert('パスワードが間違っています。もう一度お試しください。');
+                document.getElementById('passwordInput').value = '';
+            }
+        }
+
+        // ログアウト処理
+        function handleLogout() {
+            document.getElementById('mainScreen').style.display = 'none';
+            document.getElementById('loginScreen').style.display = 'flex';
+            selectedMember = '';
+            document.getElementById('postContent').value = '';
+            updateMemberButtons();
+        }
+
+        // 記入者選択
+        function selectMember(member) {
+            selectedMember = member;
+            updateMemberButtons();
+        }
+
+        // メンバーボタンの表示更新
+        function updateMemberButtons() {
+            document.querySelectorAll('.member-btn').forEach(btn => {
+                if (btn.dataset.member === selectedMember) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+        }
+
+        // 投稿送信
+        function submitPost() {
+            const content = document.getElementById('postContent').value.trim();
+            
+            if (!content) {
+                alert('メッセージを入力してください');
+                return;
+            }
+            
+            if (!selectedMember) {
+                alert('記入者を選択してください');
+                return;
+            }
+
+            const post = {
+                id: Date.now(),
+                author: selectedMember,
+                content: content,
+                timestamp: new Date().toISOString()
+            };
+
+            posts.unshift(post);
+            savePosts();
+            renderPosts();
+            
+            document.getElementById('postContent').value = '';
+            selectedMember = '';
+            updateMemberButtons();
+        }
+
+        // 投稿削除
+        function deletePost(id) {
+            posts = posts.filter(post => post.id !== id);
+            savePosts();
+            renderPosts();
+        }
+
+        // 削除確認開始
+        function startDelete(id) {
+            const post = document.getElementById(`post-${id}`);
+            const content = post.querySelector('.post-content');
+            
+            content.style.display = 'none';
+            
+            const deleteBtn = post.querySelector('.delete-btn');
+            deleteBtn.style.display = 'none';
+            
+            const confirmDiv = document.createElement('div');
+            confirmDiv.className = 'confirm-buttons';
+            confirmDiv.innerHTML = `
+                <button class="confirm-btn" onclick="deletePost(${id})">削除</button>
+                <button class="cancel-btn" onclick="cancelDelete(${id})">キャンセル</button>
+            `;
+            
+            post.querySelector('.post-header').appendChild(confirmDiv);
+        }
+
+        // 削除キャンセル
+        function cancelDelete(id) {
+            const post = document.getElementById(`post-${id}`);
+            const content = post.querySelector('.post-content');
+            const deleteBtn = post.querySelector('.delete-btn');
+            const confirmDiv = post.querySelector('.confirm-buttons');
+            
+            content.style.display = 'block';
+            deleteBtn.style.display = 'block';
+            if (confirmDiv) confirmDiv.remove();
+        }
+
+        // 投稿表示時間計算
+        function formatTime(isoString) {
+            const now = new Date();
+            const date = new Date(isoString);
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
+
+            if (diffMins < 1) return '今たった今';
+            if (diffMins < 60) return `${diffMins}分前`;
+            if (diffHours < 24) return `${diffHours}時間前`;
+            if (diffDays < 7) return `${diffDays}日前`;
+
+            return date.toLocaleDateString('ja-JP', { month: 'short', day: 'numeric' });
+        }
+
+        // 投稿表示
+        function renderPosts() {
+            const postsList = document.getElementById('postsList');
+            
+            if (posts.length === 0) {
+                postsList.innerHTML = '<div class="empty-message">メッセージはまだありません</div>';
+                return;
+            }
+
+            postsList.innerHTML = posts.map(post => `
+                <div class="post" id="post-${post.id}">
+                    <div class="post-header">
+                        <div>
+                            <div class="post-author">${post.author}</div>
+                            <div class="post-time">${formatTime(post.timestamp)}</div>
+                        </div>
+                        <button class="delete-btn" onclick="startDelete(${post.id})">🗑</button>
+                    </div>
+                    <div class="post-content">${post.content}</div>
+                </div>
+            `).join('');
+        }
+
+        // LocalStorageに保存
+        function savePosts() {
+            localStorage.setItem('familyBoardPosts', JSON.stringify(posts));
+        }
+
+        // LocalStorageから読み込み
+        function loadPosts() {
+            const saved = localStorage.getItem('familyBoardPosts');
+            if (saved) {
+                try {
+                    posts = JSON.parse(saved);
+                } catch (error) {
+                    console.error('データ読み込みエラー:', error);
+                    posts = [];
+                }
+            }
+        }
+
+        // 初期化
+        init();
+    </script>
+</body>
+</html>
